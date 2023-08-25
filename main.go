@@ -43,6 +43,7 @@ func main(){
 	}
 	fmt.Println("url:", url)
 
+	set := make(map[string]struct{})
 	//make sure that the user did not use the e flag and the n flag together, that doesnt make sense
 	if (*exists == true && *notexists == true){
 		fmt.Println("CAN NOT USE e AND n FLAGS TOGETHER\n")
@@ -73,26 +74,32 @@ func main(){
 			}else{
 				finalurl = cur[2]
 			}
-			fmt.Println(finalurl)
-			if (*exists == true) {
-				resp, err := http.Get(finalurl)
-				if err != nil {
-					fmt.Println(err)
-				}
-				if (resp.StatusCode == 200) {
-					fmt.Println(finalurl)
-				}
+			//add url to set if it is not already in there
+			set[finalurl] = struct{}{}
+			//fmt.Println(finalurl)
+			
+		}
+	}
+	for key := range(set) {
+		if (*exists == true) {
+			resp, err := http.Get(key)
+			if err != nil {
+				fmt.Println("'"+key+"':")
+				fmt.Println(err)
 			}
-			if (*notexists == true) {
-				resp, err := http.Get(finalurl)
-				if err != nil {
-					fmt.Println(err)
-				}
-				if (resp.StatusCode != 200) {
-					fmt.Println(finalurl)
-				}
+			if (resp.StatusCode == 200) {
+				fmt.Println(key)
+			}
+		}
+		if (*notexists == true) {
+			resp, err := http.Get(key)
+			if err != nil {
+				fmt.Println("'"+key+"':")
+				fmt.Println(err)
+			}
+			if (resp.StatusCode != 200) {
+				fmt.Println(key)
 			}
 		}
 	}
-	
 }
